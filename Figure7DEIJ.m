@@ -6,7 +6,7 @@
 clear all;close all;clc;
 
 nVxs_list = [10, 20, 50, 100, 200, 500];
-Cvxs = [0,0.01,0.03,0.1,0.3,0.5,0.7,0.9];  
+Cvxs = [0,0.01,0.03,0.1,0.3,0.5,0.8,0.99];  
 nNeurons = 180;
 nCnc = length(Cvxs); 
 nSimulations = 100;
@@ -42,10 +42,10 @@ if isempty(gcp) && nSimulations > 1
 end
 
 %% do it
-[Info_cTCNC, Info_SFNC] = deal(cell(1,nSimulations)); % for parallel computing purposes
+[Info_cTCNC, Info_expNC, Info_SFNC] = deal(cell(1,nSimulations)); % for parallel computing purposes
 parfor iSimu = 1:nSimulations
     iSimu
-    [Info_cTCNCtmp, Info_SFNCtmp] = deal(zeros(length(nVxs_list), nCnc));
+    [Info_cTCNCtmp, Info_expNCtmp, Info_SFNCtmp] = deal(zeros(length(nVxs_list), nCnc));
 
     for iNvxs = 1:length(nVxs_list)  % loop different voxel size
         W = 0.01 * 180/nNeurons * rand(nVxs_list(iNvxs), nNeurons);
@@ -58,6 +58,10 @@ parfor iSimu = 1:nSimulations
         
         %  generate cTCNC noise correlation matrix
         R_cTCNC = R_SC;
+        
+        %  generate expNC noise correlation matrix
+        R_expNC = 0.14 * exp(-1.9886*(1-R_SC)) + gamma;
+        R_expNC(logical(eye(size(R_expNC)))) = 1;
         
         % generate SFNC noise correlation matrix
         randOrder = Shuffle(1:nVxs_list(iNvxs));
@@ -76,6 +80,11 @@ parfor iSimu = 1:nSimulations
             tmp(logical(eye(size(tmp)))) = 1;
             Q_cTCNC = varMat.*tmp;
             
+            % expNC covariance
+            tmp = Cvxs(iCnc)*R_expNC;
+            tmp(logical(eye(size(tmp)))) = 1;
+            Q_expNC = varMat.*tmp;
+            
             % SFNC covariance
             tmp = Cvxs(iCnc)*R_SFNC;
             tmp(logical(eye(size(tmp)))) = 1;
@@ -83,16 +92,20 @@ parfor iSimu = 1:nSimulations
             
             % now do the maximum likelihood estimator
             Info_cTCNCtmp1 = 0;
+            Info_expNCtmp1 = 0;
             Info_SFNCtmp1 = 0;
             for i = 1:180 % loop 180 orientations                
                 Info_cTCNCtmp1 =  Info_cTCNCtmp1 + meanVxsResp_derive(:, i)' / Q_cTCNC * meanVxsResp_derive(:, i);
+                Info_expNCtmp1 = Info_expNCtmp1 + meanVxsResp_derive(:, i)' / Q_expNC * meanVxsResp_derive(:, i);
                 Info_SFNCtmp1 =  Info_SFNCtmp1 + meanVxsResp_derive(:, i)' / Q_SFNC * meanVxsResp_derive(:, i);
             end
             Info_cTCNCtmp(iNvxs,iCnc) = Info_cTCNCtmp1 / 180; % information per simulus
+            Info_expNCtmp(iNvxs,iCnc) = Info_expNCtmp1 / 180; % 
             Info_SFNCtmp(iNvxs,iCnc) = Info_SFNCtmp1 / 180;            
         end
     end
     Info_cTCNC{iSimu} = Info_cTCNCtmp; % for parallel computing purpose;
+    Info_expNC{iSimu} = Info_expNCtmp;
     Info_SFNC{iSimu} = Info_SFNCtmp; 
 end
 
@@ -102,34 +115,49 @@ if ~isempty(gcp)
 end
 %% preprocess the data
 Info_SFNC_all =  cat(3, Info_SFNC{:});
+Info_expNC_all = cat(3, Info_expNC{:});
 Info_cTCNC_all =  cat(3, Info_cTCNC{:});
+
 Info_SFNC = mean(Info_SFNC_all,3);
+Info_expNC = mean(Info_expNC_all,3);
 Info_cTCNC = mean(Info_cTCNC_all,3);
 
 %%
 close all;
-h1 = cpsfigure(1,2);
-set(h1,'Position',[0 0 800 300]);
-ax(1) = subplot(1,2,1);
+h1 = cpsfigure(1,3);
+set(h1,'Position',[0 0 1200 300]);
+
+ax(1) = subplot(1,3,1);
 [lh,eh1] = myplot(nVxs_list, Info_cTCNC',[], '-'); hold on;
 c = cool(length(lh));
 for i=1:length(lh);set(lh(i),'Color',c(i,:));end
 xlabel('Number of voxels'); ylabel('Information');
-title('TCNC');
+title('cTCNC');
 legend(legend_labels);
 set(gca, 'XScale','log', 'YScale','log');
 
-ax(2) = subplot(1,2,2);
-[lh, eh2] = myplot(nVxs_list, Info_SFNC',[], '-'); hold on;
+ax(2) = subplot(1,3,2);
+[lh,eh2] = myplot(nVxs_list, Info_expNC',[], '-'); hold on;
+c = cool(length(lh));
+for i=1:length(lh);set(lh(i),'Color',c(i,:));end
+xlabel('Number of voxels'); ylabel('Information');
+title('expNC');
+legend(legend_labels);
+set(gca, 'XScale','log', 'YScale','log');
+
+ax(3) = subplot(1,3,3);
+[lh, eh3] = myplot(nVxs_list, Info_SFNC',[], '-'); hold on;
 c = cool(length(lh));
 for i=1:length(lh);set(lh(i),'Color',c(i,:));end
 title('SFNC');
 xlabel('Number of voxels'); ylabel('Information');
 set(gca, 'XScale','log', 'YScale','log');
 
-h2 = cpsfigure(1,2);
-set(h2,'Position',[0 0 800 300]);
-ax(1) = subplot(1,2,1);
+
+
+h2 = cpsfigure(1,3);
+set(h2,'Position',[0 0 1200 300]);
+ax(1) = subplot(1,3,1);
 [lh,eh1] = myplot(Cvxs, Info_cTCNC,[], '-'); hold on;
 c = parula(length(lh));
 for i=1:length(lh);set(lh(i),'Color',c(i,:));end
@@ -138,8 +166,17 @@ title('cTCNC');
 legend(legend_labels_nVxs);
 set(gca, 'YScale','log');
 
-ax(2) = subplot(1,2,2);
-[lh,eh2] = myplot(Cvxs, Info_SFNC,[], '-'); hold on;
+ax(2) = subplot(1,3,2);
+[lh,eh2] = myplot(Cvxs, Info_expNC,[], '-'); hold on;
+c = parula(length(lh));
+for i=1:length(lh);set(lh(i),'Color',c(i,:));end
+xlabel('Cvxs'); ylabel('Information');
+title('expNC');
+legend(legend_labels_nVxs);
+set(gca, 'YScale','log');
+
+ax(3) = subplot(1,3,3);
+[lh,eh3] = myplot(Cvxs, Info_SFNC,[], '-'); hold on;
 c = parula(length(lh));
 for i=1:length(lh);set(lh(i),'Color',c(i,:));end
 title('SFNC');

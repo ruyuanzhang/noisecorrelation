@@ -7,12 +7,12 @@ clear all;close all;clc;
 nVxs_list = [10, 20, 50, 100, 200, 500];
 nTrials = [1000, 1000, 1000, 1000, 2000, 5000]; % how many trials per stim to simulate
 
-Cvxs = [0, 0.01,0.03,0.1,0.3,0.5,0.7,0.9];  % level of noise correlation coeffient
+Cvxs = [0, 0.01,0.03,0.1,0.3,0.5,0.8,0.99];  % level of noise correlation coeffient
 nCvxs = length(Cvxs); 
 nSimulations = 10;
 stim1 = 80;
 stim2 = 100;
-wantsave = 1;
+wantsave = 0;
 
 %
 nNeurons = 180; % number of neurons under a voxel

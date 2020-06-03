@@ -1,14 +1,16 @@
 %% In this script, we manipulate both neural and voxel-wise noise correlations on a stimulus-estimation task
 % This script corresponds to Figure 6 panel B
+% Running this script may take several minutes
 
 clear all;close all;clc;
+
 %%
 nVxs = 200; % number of voxels
 nNeurons = 180; % number of neurons
-Cnc_vxs = [0, 0.01, 0.03, 0.1, 0.3, 0.5, 0.7, 0.9];  % NC coefficients for voxels
-Cnc_neuron = [0, 0.01, 0.03, 0.1, 0.3, 0.5, 0.7, 0.9];  % NC coefficients for neurons
+Cnc_vxs = [0, 0.01, 0.03, 0.1, 0.3, 0.5, 0.8, 0.99];  % NC coefficients for voxels
+Cnc_neuron = [0, 0.01, 0.03, 0.1, 0.3, 0.5, 0.8, 0.99];  % NC coefficients for neurons
 nSimulations = 10;
-wantsave = 1;
+wantsave = 0;
 
 nTrials = 1000; % how many trials per stim to simulate
 
@@ -16,7 +18,7 @@ nTrials = 1000; % how many trials per stim to simulate
 vxsVarMean = 3;
 vxsVarStd = 1;
 
-% compute channel responses of 8 channels for 180 stim
+% Compute channel responses of 8 channels for 180 stim
 phi = 0: 180 / nNeurons:180; % eight equally spaced orientation channels from 0-180.
 phi = phi(2:end);
 oriStim = 1:180;

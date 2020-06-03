@@ -1,12 +1,13 @@
 %% In this script, we manipulate both neural and voxel-wise noise correlations on a stimulus-classification task
 % This script corresponds to Figure 6 panel A
+% Running this script takes around 5 mins
 
 %%
 clear all;close all;clc;
 nVxs = 200; % number of voxels in the model
 nNeurons = 180; % number of neurons in the model 
-Cnc_vxs = [0, 0.01, 0.03, 0.1, 0.3, 0.5, 0.7, 0.9];  % NC coefficients for voxels
-Cnc_neuron = [0, 0.03, 0.1, 0.3, 0.5, 0.7, 0.9];  % NC coefficients for neurons
+Cnc_vxs = [0, 0.01, 0.03, 0.1, 0.3, 0.5, 0.8, 0.99];  % NC coefficients for voxels
+Cnc_neuron = [0, 0.03, 0.1, 0.3, 0.5, 0.8, 0.99];  % NC coefficients for neurons
 nSimulations = 10;
 stim1 = 80;  
 stim2 = 100;
@@ -23,7 +24,7 @@ phi = phi(2:end);
 oriStim = 1:180;
 channelResp = zeros(nNeurons, length(oriStim)); % 
 
-% params tuning curves
+% Params tuning curves
 alpha = 1;
 beta = 19;
 gamma = 2;
@@ -39,7 +40,7 @@ populationMean1 = meanNeuronResp(:, stim1);
 populationMean2 = meanNeuronResp(:, stim2);
 
 % create variance matrix for all voxels
-tau = gamrnd(n_mean^2/n_std,n_std/n_mean,[1, nVxs]);
+tau = gamrnd(vxsVarMean^2/vxsVarStd, vxsVarStd/vxsVarMean,[1, nVxs]);
 varMat = sqrt(tau')*sqrt(tau);
 %% open parallel
 % if isempty(gcp) && nSimulations>1

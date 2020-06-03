@@ -9,7 +9,7 @@ stim1 = 88;  % deg, set up two stimuli
 stim2 = 92;  
 nNeurons_list = [10, 20, 50, 100, 200, 400]; % number of neurons in the pool
 nTrials_list = nNeurons_list * 100; % number of trials to stimulate
-Cneuron = [0, 0.1,0.3, 0.5, 0.7, 0.9]; % Noise correlation coefficient between neurons
+Cneuron = [0, 0.1, 0.3, 0.5, 0.8, 0.99]; % Noise correlation coefficient between neurons
 nSimulations = 100;
 wantsave = 1; % whether to save all simulation data
 
@@ -122,7 +122,7 @@ for iSimu = 1:nSimulations % loop simulations
         end
     end
     pCorrect_aTCNC{iSimu} = pCorrectcTCNCtmp;
-    pCorrect_cTCNC{iSimu} = pCorrectcTCNC;
+    pCorrect_cTCNC{iSimu} = pCorrectcTCNCtmp;
     pCorrect_SFNC{iSimu} = pCorrectSFNCtmp;
 end
 clear training sample data1 data2;

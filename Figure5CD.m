@@ -6,7 +6,7 @@
 clear all;close all;clc;
 
 nVxs_list = [10, 20, 50, 100, 200, 500];
-Cvxs = [0, 0.01, 0.03, 0.1, 0.3, 0.5, 0.7, 0.9];  
+Cvxs = [0, 0.01, 0.03, 0.1, 0.3, 0.5, 0.8, 0.99];  
 
 nNeurons = 180;
 nTrials = 1000; % how many trials per stim to simulate

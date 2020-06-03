@@ -5,9 +5,9 @@
 clear all;close all;clc;
 
 nNeurons_list = [10, 20, 50, 100, 200, 400, 1000, 2000];
-Cneuron = [0, 0.03, 0.1, 0.3, 0.5, 0.7, 0.9]; % noise correlation coefficient
+Cneuron = [0, 0.03, 0.1, 0.3, 0.5, 0.8, 0.99]; % noise correlation coefficient
 
-wantsave = 1;
+wantsave = 0;
 
 % params for the tuning curve
 alpha = 1;
@@ -28,6 +28,7 @@ for iNeuron = 1:length(nNeurons_list)
     % von mises tuning curve
     [orienxx, phiyy] = meshgrid(orien, phi);
     meanNeuronResp = alpha + beta * exp(gamma*(cos((orienxx - phiyy)*pi/90) - 1)); % nNeurons x nOrientation responses
+    
     meanNeuronResp_derive = -pi/90*gamma*beta*exp(gamma*(cos((orienxx - phiyy)*pi/90) - 1)) .* ...
     sin(pi/90*(orienxx-phiyy));
     

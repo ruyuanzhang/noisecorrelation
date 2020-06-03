@@ -3,9 +3,11 @@ For any issues or questions, contact Ru-Yuan Zhang at [ruyuanzhangATgmail.com](r
 
 
 ## Description
-This repository contains the code to simulate the effects of voxelwise noise correlations on population codes in fMRI. 
+* This repository contains the code to simulate the effects of voxelwise noise correlations on population codes in fMRI. 
 
-The manuscript has been uploaded to [bioRxiv](https://www.biorxiv.org/content/10.1101/592618v1.abstract)
+* The manuscript has been uploaded to [bioRxiv](https://www.biorxiv.org/content/10.1101/592618v1.abstract)
+
+* The scripts require dependency utility functions in [RZutil](https://github.com/ruyuanzhang/RZutil)
 
 
 ## Citation
